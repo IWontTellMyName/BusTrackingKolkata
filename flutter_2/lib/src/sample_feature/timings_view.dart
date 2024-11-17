@@ -3,6 +3,7 @@ import 'package:flutter_2/src/sample_feature/schedule.dart';
 import 'schedule.dart';
 import 'timings.dart';
 import 'remote_service.dart';
+import 'package:intl/intl.dart';
 
 
 /// Displays detailed information about a SampleItem.
@@ -30,9 +31,23 @@ class _TimingsViewState extends State<TimingsView> {
     timing_list = await RemoteService().getTiming('${widget.schedule.bus}');
     if(timing_list != null)
     {
+      calculateCumulativeTimings(timing_list!, DateTime.now());
       setState(() {
         isLoaded = true;
       });
+    }
+  }
+
+  void calculateCumulativeTimings(List<Timings> timings, DateTime startTime)
+  {
+    DateTime cumulativeTime = startTime;
+
+    for (var i = 0; i < timings.length; i++)
+    {
+      cumulativeTime = cumulativeTime.add(timings[i].prevStopTime);
+      // if (i=0) cumulativeStopTime += timings[i]+prevStopTime;
+      // else cumulativeStopTime += timings[i]+prevStopTime;
+      timings[i].cumulativeStopTime = cumulativeTime;
     }
   }
 
@@ -50,10 +65,10 @@ class _TimingsViewState extends State<TimingsView> {
         restorationId: 'sampleItemListView',
         itemCount: timing_list?.length,
         itemBuilder: (BuildContext context, int index) {
-          
+
           return ListTile(
             title: Text(timing_list![index].stoppage),
-            subtitle: Text(timing_list![index].prevStopTime.toString()),
+            subtitle: Text(DateFormat.jm().format(timing_list![index].cumulativeStopTime!)),
             leading: const CircleAvatar(
               // Display the Flutter Logo image asset.
               foregroundImage: AssetImage('assets/images/flutter_logo.png'),

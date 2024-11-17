@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:duration/duration.dart';
+import 'package:flutter/material.dart';
 
 List<Timings> routeFromJson(String str) => List<Timings>.from(json.decode(str).map((x) => Timings.fromJson(x)));
 
@@ -11,6 +12,7 @@ class Timings {
     String bus, stoppage;
     int sequence;
     Duration prevStopTime, nextStopTime;
+    DateTime? cumulativeStopTime;
 
     Timings({
         required this.prevStopTime,
@@ -18,11 +20,12 @@ class Timings {
         required this.sequence,
         required this.bus,
         required this.stoppage,
+        this.cumulativeStopTime,
     });
 
     factory Timings.fromJson(Map<String, dynamic> json) => Timings(
-        prevStopTime: parseTime("00:02:30"),//json["prev_stop_time"]),
-        nextStopTime: parseTime("00:02:30"),//json["next_stop_time"]),
+        prevStopTime: parseTime(json["prev_stop_time"]+".000000"),
+        nextStopTime: parseTime(json["prev_stop_time"]+".000000"),
         sequence: json["sequence"],
         bus: json["bus"],
         stoppage: json["stoppage"],
